@@ -374,7 +374,7 @@ function renderDatabase(container) {
   // Bind delete buttons
   document.getElementById('btnClearOrders')?.addEventListener('click', async () => {
     if (!confirm('⚠️ Are you sure? This will permanently delete ALL orders, order items, and payments from the database.')) return;
-    if (!confirm('This cannot be undone. Type YES to confirm.')) return;
+    if (prompt('This cannot be undone. Type YES to confirm.') !== 'YES') return;
     try {
       const res = await fetch(`${API}/admin/clear/orders`, {
         method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
@@ -387,7 +387,7 @@ function renderDatabase(container) {
 
   document.getElementById('btnClearCustomers')?.addEventListener('click', async () => {
     if (!confirm('⚠️ Are you sure? This will permanently delete ALL customer accounts and their orders/payments.')) return;
-    if (!confirm('This cannot be undone. Type YES to confirm.')) return;
+    if (prompt('This cannot be undone. Type YES to confirm.') !== 'YES') return;
     try {
       const res = await fetch(`${API}/admin/clear/customers`, {
         method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
