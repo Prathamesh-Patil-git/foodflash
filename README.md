@@ -165,6 +165,26 @@ users ──(1:N)──> orders ──(1:N)──> order_items ──(N:1)──
 
 ---
 
+## ⚙️ How It Works
+
+### Overall Workflow
+1. **User Browsing & Cart (Redis):** When a customer browses the menu, data is fetched via Flask APIs. As they add items to their cart, the cart state is stored in **Redis** (an in-memory key-value store) for extremely fast, persistent access across page reloads without constantly hitting the primary MySQL database.
+2. **Checkout & Payment:** When checking out, a pending order is created in MySQL and a payment request is sent to **Razorpay**. The system then waits for Razorpay to verify the payment signature.
+3. **ACID Transaction:** Once payment is verified, a **MySQL Stored Procedure** (`place_order()`) executes as a strict transaction (COMMIT/ROLLBACK) to finalize the order, update stats, and clear the Redis cart.
+4. **Order Tracking:** The user can track their order status (Preparing → Served) in real-time as the Admin updates it from the dashboard.
+
+### 🤖 AI Chatbot (RAG & ChromaDB)
+FoodFlash features an intelligent menu assistant powered by **Retrieval-Augmented Generation (RAG)** using **ChromaDB** and the **Google Gemini API**.
+
+Here is how it works under the hood:
+1. **Data Ingestion (Embeddings):** When the application starts, the details of all menu items (names, categories, prices, veg/non-veg status) are converted into mathematical vectors (embeddings) and stored in **ChromaDB**, our vector database.
+2. **User Query:** The customer asks a natural language question (e.g., *"I want something spicy and vegetarian under ₹300"*).
+3. **Semantic Search (Retrieval):** The backend converts the user's query into a vector and performs a **Cosine Similarity Search** in ChromaDB. This retrieves the top most semantically relevant menu items from the database, matching the intent even if the exact keywords differ.
+4. **LLM Generation (Augmentation):** The retrieved menu items are injected into a strict system prompt alongside the user's original query. This augmented prompt is sent to the **Gemini API**.
+5. **Final Response:** Gemini generates a natural, conversational response that strictly adheres to the retrieved context (preventing hallucinations) and formats the output (e.g., highlighting prices). The response is then returned to the frontend chat widget.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites

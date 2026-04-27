@@ -1,6 +1,6 @@
 // ===== FoodFlash — Admin JS Module =====
 // Dashboard stats, order management, menu CRUD, section switching
-const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+var API = window.FOODFLASH_API || 'http://localhost:5000/api';
 
 let liveOrders = [];
 let liveMenuItems = [];
@@ -313,7 +313,7 @@ function renderChatbot(container) {
     msgs.innerHTML += `<div class="chat-msg user">${msg}</div>`;
     input.value = '';
     try {
-      const r = await fetch(`${API}/chatbot/ask`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg}) });
+      const r = await fetch(`${API}/chatbot`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({query:msg}) });
       const d = await r.json();
       msgs.innerHTML += `<div class="chat-msg bot">${d.response || d.message || 'Sorry, I could not process that.'}</div>`;
     } catch {

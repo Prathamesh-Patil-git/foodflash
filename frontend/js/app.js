@@ -1,4 +1,6 @@
 // ===== FoodFlash — Shared App JS =====
+const currentHost = window.location.hostname || 'localhost';
+window.FOODFLASH_API = `http://${currentHost}:5000/api`;
 
 // --- Theme: apply saved theme immediately to prevent flash ---
 (function() {
@@ -64,7 +66,7 @@ async function addToCart(id) {
   // If not found (e.g. called from homepage), fetch it from API
   if (!item) {
     try {
-      const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+      var API = window.FOODFLASH_API || 'http://localhost:5000/api';
       const r = await fetch(`${API}/menu/${id}`);
       if (r.ok) {
         const d = await r.json();
@@ -119,11 +121,13 @@ function showToast(message) {
 }
 
 // --- Chatbot toggle (handled by chatbot.js if loaded, fallback here) ---
-if (!document.querySelector('script[src*="chatbot.js"]')) {
-  document.getElementById('chatbotToggle')?.addEventListener('click', () => {
-    document.getElementById('chatbotWindow')?.classList.toggle('open');
-  });
-}
+document.addEventListener('DOMContentLoaded', () => {
+  if (!document.querySelector('script[src*="chatbot.js"]')) {
+    document.getElementById('chatbotToggle')?.addEventListener('click', () => {
+      document.getElementById('chatbotWindow')?.classList.toggle('open');
+    });
+  }
+});
 
 
 // --- Intersection Observer for animations ---

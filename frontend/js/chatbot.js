@@ -1,6 +1,6 @@
 // ===== FoodFlash — Chatbot JS Module =====
 // RAG chatbot using ChromaDB + Gemini via Flask API
-const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+var API = window.FOODFLASH_API || 'http://localhost:5000/api';
 
 const chatToggle = document.getElementById('chatbotToggle');
 const chatWindow = document.getElementById('chatbotWindow');
@@ -38,7 +38,7 @@ async function sendChatMessage() {
     const res = await fetch(`${API}/chatbot`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg })
+      body: JSON.stringify({ query: msg })
     });
 
     typingDiv.remove();

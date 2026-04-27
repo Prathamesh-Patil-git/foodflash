@@ -32,6 +32,8 @@ dump.rdb
 
 # ChromaDB
 chroma_db/
+chroma_data/
+backend/chroma_data/
 
 # Logs
 *.log
@@ -40,3 +42,4 @@ chroma_db/
 _migrate.py
 _fix_*.py
 test_*.py
+_test_*.py

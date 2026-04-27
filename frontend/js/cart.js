@@ -1,6 +1,6 @@
 // ===== FoodFlash — Cart JS Module =====
 // Cart CRUD via Redis API + Razorpay checkout integration
-const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+var API = window.FOODFLASH_API || 'http://localhost:5000/api';
 const TAX_RATE = 0.05;
 let discountAmount = 0;
 

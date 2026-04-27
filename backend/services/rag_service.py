@@ -18,7 +18,7 @@ class RAGService:
         # Gemini AI setup
         if Config.GEMINI_API_KEY:
             genai.configure(api_key=Config.GEMINI_API_KEY)
-            self.model = genai.GenerativeModel('gemini-pro')
+            self.model = genai.GenerativeModel('gemini-flash-latest')
         else:
             self.model = None
 
@@ -93,6 +93,7 @@ Rules:
                 response = self.model.generate_content(prompt)
                 return response.text
             except Exception as e:
+                print("Gemini API Error:", e)
                 return self._fallback_response(metadatas)
         else:
             return self._fallback_response(metadatas)

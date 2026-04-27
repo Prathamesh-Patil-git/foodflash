@@ -1,5 +1,5 @@
 // ===== FoodFlash — Menu JS Module =====
-const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+var API = window.FOODFLASH_API || 'http://localhost:5000/api';
 const DEMO = [];
 
 let allMenuItems = [];

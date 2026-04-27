@@ -1,7 +1,7 @@
 // ===== FoodFlash — Orders JS Module =====
 // Fetches order history from Flask API, renders order cards with
 // status timeline and cancel button (ACID refund before food_prepared)
-const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+var API = window.FOODFLASH_API || 'http://localhost:5000/api';
 
 const statusConfig = {
   placed:           { label:'Order Placed', icon:'fa-clock', class:'status-placed', step:1 },
