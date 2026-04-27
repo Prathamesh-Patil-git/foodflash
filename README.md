@@ -141,7 +141,7 @@ The database follows a **normalized 3NF schema** with 6 core tables designed for
 
 | Table | Description |
 |-------|-------------|
-| `users` | Customer & admin accounts — name, email, phone, address, role (customer/admin) |
+| `users` | Customer & admin accounts — name, email, phone, role (customer/admin) |
 | `restaurants` | Single restaurant config — name, cuisine, rating, price |
 | `menu_items` | Food items — FK→restaurants, category, price, veg/non-veg, availability |
 | `orders` | Customer orders — FK→users, total, tax, discount, status tracking, ACID |

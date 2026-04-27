@@ -6,13 +6,13 @@ USE foodflash;
 -- =============================================
 -- USERS (password: admin1234 / test1234 → bcrypt)
 -- =============================================
-INSERT INTO users (name, email, password_hash, phone, address, role) VALUES
-('Admin User',    'admin@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543210', '1, Admin Lane, Mumbai', 'admin'),
-('Rahul Sharma',  'rahul@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543211', '42, MG Road, Pune', 'customer'),
-('Priya Mehta',   'priya@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543212', '15, FC Road, Pune', 'customer'),
-('Amit Kumar',    'amit@test.com',     '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543213', '78, JM Road, Pune', 'customer'),
-('Sneha Reddy',   'sneha@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543214', '23, Koregaon Park, Pune', 'customer'),
-('Customer User', 'customer@test.com', '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543215', '99, Baner, Pune', 'customer');
+INSERT INTO users (name, email, password_hash, phone, role) VALUES
+('Admin User',    'admin@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543210', 'admin'),
+('Rahul Sharma',  'rahul@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543211', 'customer'),
+('Priya Mehta',   'priya@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543212', 'customer'),
+('Amit Kumar',    'amit@test.com',     '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543213', 'customer'),
+('Sneha Reddy',   'sneha@test.com',    '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543214', 'customer'),
+('Vikram Singh',  'vikram@test.com',   '$2b$12$9Xd1qBg3MJFcFS4yrSmIl.uVuDW5aVv3GmU0/X/x.eW930hx7q0Zu', '9876543215', 'customer');
 
 -- =============================================
 -- RESTAURANT (single entry)

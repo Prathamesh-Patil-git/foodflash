@@ -17,7 +17,6 @@ erDiagram
         varchar email
         varchar password_hash
         varchar phone
-        text address
         enum role "customer | admin"
         timestamp created_at
     }

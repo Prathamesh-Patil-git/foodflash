@@ -76,12 +76,12 @@ async function handleLogin(email, password) {
 }
 
 // --- Register ---
-async function handleRegister(name, email, password, phone, address) {
+async function handleRegister(name, email, password, phone) {
   try {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, phone, address })
+      body: JSON.stringify({ name, email, password, phone })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Registration failed');
@@ -151,7 +151,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
   const password = document.getElementById('regPassword').value;
   const confirm = document.getElementById('confirmPassword').value;
   const phone = document.getElementById('phone')?.value || '';
-  const address = document.getElementById('address')?.value || '';
+  // Address removed
 
   if (password !== confirm) {
     showToast('Passwords do not match');
@@ -167,7 +167,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
 
   try {
-    await handleRegister(name, email, password, phone, address);
+    await handleRegister(name, email, password, phone);
   } catch {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';

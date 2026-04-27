@@ -13,7 +13,6 @@ def register():
     email = data.get('email')
     password = data.get('password')
     phone = data.get('phone', '')
-    address = data.get('address', '')
 
     if not all([name, email, password]):
         return jsonify({'error': 'Name, email and password are required'}), 400
@@ -26,8 +25,8 @@ def register():
     # Create user
     hashed = hash_password(password)
     user_id = execute_query(
-        "INSERT INTO users (name, email, password_hash, phone, address) VALUES (%s, %s, %s, %s, %s)",
-        (name, email, hashed, phone, address), fetch=False
+        "INSERT INTO users (name, email, password_hash, phone) VALUES (%s, %s, %s, %s)",
+        (name, email, hashed, phone), fetch=False
     )
 
     token = generate_token(user_id, 'customer')
@@ -66,7 +65,6 @@ def login():
             'email': user['email'],
             'role': user['role'],
             'phone': user['phone'],
-            'address': user['address'],
             'restaurant_id': user.get('restaurant_id')
         }
     })
@@ -77,7 +75,7 @@ def login():
 def get_profile():
     """Get current user's profile."""
     users = execute_query(
-        "SELECT id, name, email, phone, address, role, created_at FROM users WHERE id = %s",
+        "SELECT id, name, email, phone, role, created_at FROM users WHERE id = %s",
         (request.user_id,)
     )
     if not users:
@@ -93,7 +91,7 @@ def update_profile():
     name = data.get('name')
     email = data.get('email')
     phone = data.get('phone', '')
-    address = data.get('address', '')
+    phone = data.get('phone', '')
 
     if not name or not email:
         return jsonify({'error': 'Name and email are required'}), 400
@@ -106,12 +104,12 @@ def update_profile():
         return jsonify({'error': 'Email already in use by another account'}), 409
 
     execute_query(
-        "UPDATE users SET name = %s, email = %s, phone = %s, address = %s WHERE id = %s",
-        (name, email, phone, address, request.user_id), fetch=False
+        "UPDATE users SET name = %s, email = %s, phone = %s WHERE id = %s",
+        (name, email, phone, request.user_id), fetch=False
     )
 
     return jsonify({
         'message': 'Profile updated successfully',
-        'user': {'id': request.user_id, 'name': name, 'email': email, 'phone': phone, 'address': address}
+        'user': {'id': request.user_id, 'name': name, 'email': email, 'phone': phone}
     })
 

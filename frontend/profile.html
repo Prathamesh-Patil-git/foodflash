@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Manage your FoodFlash profile — update name, email, phone, and delivery address.">
+  <meta name="description" content="Manage your FoodFlash profile — update name, email, and phone.">
   <title>My Profile — FoodFlash</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -218,10 +218,6 @@
                 <input type="text" id="profileProvider" disabled>
               </div>
             </div>
-            <div>
-              <label for="profileAddress"><i class="fas fa-map-marker-alt"></i> Delivery Address</label>
-              <textarea id="profileAddress" placeholder="Enter your default delivery address"></textarea>
-            </div>
             <div class="profile-actions">
               <button type="button" class="btn btn-secondary" id="resetBtn">
                 <i class="fas fa-undo"></i> Reset
@@ -287,11 +283,11 @@
       document.getElementById('profileName').value = user.name || '';
       document.getElementById('profileEmail').value = user.email || '';
       document.getElementById('profilePhone').value = user.phone || '';
-      document.getElementById('profileAddress').value = user.address || '';
+      // removed address field
       document.getElementById('profileProvider').value = user.provider === 'google' ? '🔗 Google Account' : '🔑 Email & Password';
 
       // Save original for reset
-      originalData = { name: user.name || '', email: user.email || '', phone: user.phone || '', address: user.address || '' };
+      originalData = { name: user.name || '', email: user.email || '', phone: user.phone || '' };
 
       // Stats (fetched from API)
       loadStats();
@@ -336,8 +332,7 @@
       const updated = {
         name: document.getElementById('profileName').value.trim(),
         email: document.getElementById('profileEmail').value.trim(),
-        phone: document.getElementById('profilePhone').value.trim(),
-        address: document.getElementById('profileAddress').value.trim()
+        phone: document.getElementById('profilePhone').value.trim()
       };
 
       // Try updating via API
@@ -380,7 +375,7 @@
       document.getElementById('profileName').value = originalData.name;
       document.getElementById('profileEmail').value = originalData.email;
       document.getElementById('profilePhone').value = originalData.phone;
-      document.getElementById('profileAddress').value = originalData.address;
+      // removed address
       showToast('Changes reverted');
     });
 
