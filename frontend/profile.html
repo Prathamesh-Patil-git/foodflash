@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your FoodFlash profile — update name, email, phone, and delivery address.">
+  <title>My Profile — FoodFlash</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .profile-page { padding-top: 120px; min-height: 100vh; }
+    .profile-container { max-width: 720px; margin: 0 auto; }
+
+    /* Profile header with avatar */
+    .profile-header {
+      display: flex; align-items: center; gap: 24px;
+      padding: 32px; border-radius: 20px;
+      background: var(--bg-card); border: 1px solid var(--border-glass);
+      margin-bottom: 32px; position: relative; overflow: hidden;
+    }
+    .profile-header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+      opacity: 0.15;
+    }
+    .profile-avatar {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; color: #fff; font-weight: 800;
+      flex-shrink: 0; position: relative; z-index: 1;
+      border: 3px solid var(--bg-primary);
+      overflow: hidden;
+    }
+    .profile-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .profile-header-info { position: relative; z-index: 1; }
+    .profile-header-info h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
+    .profile-header-info p { color: var(--text-muted); font-size: 0.9rem; }
+    .profile-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255,107,53,0.15); color: var(--accent-orange);
+      padding: 4px 12px; border-radius: 20px; font-size: 0.75rem;
+      font-weight: 600; margin-top: 8px;
+    }
+
+    /* Profile form card */
+    .profile-card {
+      background: var(--bg-card); border: 1px solid var(--border-glass);
+      border-radius: 20px; padding: 32px; margin-bottom: 24px;
+    }
+    .profile-card h3 {
+      font-size: 1.15rem; font-weight: 700; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .profile-card h3 i {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+    }
+    .profile-form { display: flex; flex-direction: column; gap: 20px; }
+    .profile-form .form-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .profile-form label {
+      display: block; font-size: 0.85rem; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 6px;
+    }
+    .profile-form input, .profile-form textarea {
+      width: 100%; padding: 12px 16px; border-radius: 12px;
+      background: var(--bg-primary); border: 1px solid var(--border-glass);
+      color: var(--text-primary); font-size: 0.95rem;
+      font-family: var(--font); transition: all 0.3s ease;
+    }
+    .profile-form input:focus, .profile-form textarea:focus {
+      outline: none; border-color: var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.15);
+    }
+    .profile-form input:disabled {
+      opacity: 0.6; cursor: not-allowed;
+    }
+    .profile-form textarea { resize: vertical; min-height: 80px; }
+    .profile-actions {
+      display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px;
+    }
+    .profile-actions .btn { min-width: 140px; }
+
+    /* Danger zone */
+    .danger-zone {
+      border-color: rgba(239,68,68,0.3);
+    }
+    .danger-zone h3 i {
+      background: rgba(239,68,68,0.15); color: var(--accent-red);
+    }
+
+    /* Stats row */
+    .profile-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 32px;
+    }
+    .profile-stat {
+      background: var(--bg-card); border: 1px solid var(--border-glass);
+      border-radius: 16px; padding: 20px; text-align: center;
+    }
+    .profile-stat-value {
+      font-size: 1.5rem; font-weight: 800; color: var(--accent-orange);
+    }
+    .profile-stat-label {
+      font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;
+    }
+
+    /* Toast for save confirmation */
+    .save-indicator {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--accent-green); font-size: 0.85rem; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .save-indicator.visible { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .profile-header { flex-direction: column; text-align: center; }
+      .profile-form .form-row { grid-template-columns: 1fr; }
+      .profile-stats { grid-template-columns: 1fr; }
+      .profile-actions { flex-direction: column; }
+      .profile-actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-logo"><span>🍔</span> FoodFlash</a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a><a href="menu.html">Menu</a>
+        <a href="cart.html">Cart</a><a href="orders.html">My Orders</a>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
+        </button>
+        <a href="cart.html" class="btn-icon cart-btn"><i class="fas fa-cart-shopping"></i><span class="cart-count" id="navCartCount">0</span></a>
+        <a href="login.html" class="btn btn-primary btn-sm">Login</a>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="profile-page section">
+    <div class="container profile-container">
+
+      <!-- Not logged in state -->
+      <div id="notLoggedIn" style="display:none;text-align:center;padding:80px 0;">
+        <div style="font-size:4rem;margin-bottom:20px;">🔒</div>
+        <h2 style="margin-bottom:12px;">Please login first</h2>
+        <p style="color:var(--text-muted);margin-bottom:32px;">You need to be logged in to view your profile.</p>
+        <a href="login.html" class="btn btn-primary btn-lg"><i class="fas fa-sign-in-alt"></i> Login</a>
+      </div>
+
+      <!-- Profile content -->
+      <div id="profileContent" style="display:none;">
+
+        <!-- Profile Header -->
+        <div class="profile-header animate-in">
+          <div class="profile-avatar" id="profileAvatar">
+            <!-- Will be set by JS: initials or Google photo -->
+          </div>
+          <div class="profile-header-info">
+            <h2 id="profileDisplayName">User</h2>
+            <p id="profileDisplayEmail">user@example.com</p>
+            <div class="profile-badge" id="profileBadge">
+              <i class="fas fa-user"></i> <span id="profileRole">Customer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="profile-stats">
+          <div class="profile-stat animate-in">
+            <div class="profile-stat-value" id="statOrders">0</div>
+            <div class="profile-stat-label">Total Orders</div>
+          </div>
+          <div class="profile-stat animate-in">
+            <div class="profile-stat-value" id="statSpent">₹0</div>
+            <div class="profile-stat-label">Total Spent</div>
+          </div>
+          <div class="profile-stat animate-in">
+            <div class="profile-stat-value" id="statSince">—</div>
+            <div class="profile-stat-label">Member Since</div>
+          </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="profile-card animate-in">
+          <h3>
+            <i style="background:rgba(255,107,53,0.15);color:var(--accent-orange);"><i class="fas fa-user-edit"></i></i>
+            Personal Information
+            <span class="save-indicator" id="saveIndicator"><i class="fas fa-check-circle"></i> Saved</span>
+          </h3>
+          <form class="profile-form" id="profileForm">
+            <div class="form-row">
+              <div>
+                <label for="profileName"><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" id="profileName" placeholder="Your full name" required>
+              </div>
+              <div>
+                <label for="profileEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="profileEmail" placeholder="you@example.com" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="profilePhone"><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="tel" id="profilePhone" placeholder="+91 98765 43210">
+              </div>
+              <div>
+                <label for="profileProvider"><i class="fas fa-shield-alt"></i> Login Method</label>
+                <input type="text" id="profileProvider" disabled>
+              </div>
+            </div>
+            <div>
+              <label for="profileAddress"><i class="fas fa-map-marker-alt"></i> Delivery Address</label>
+              <textarea id="profileAddress" placeholder="Enter your default delivery address"></textarea>
+            </div>
+            <div class="profile-actions">
+              <button type="button" class="btn btn-secondary" id="resetBtn">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+              <button type="submit" class="btn btn-primary" id="saveBtn">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="profile-card danger-zone animate-in">
+          <h3>
+            <i><i class="fas fa-exclamation-triangle"></i></i>
+            Account Actions
+          </h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-secondary" id="logoutBtn" style="border-color:var(--accent-red);color:var(--accent-red);">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <button class="btn btn-secondary" id="clearCartBtn">
+              <i class="fas fa-trash"></i> Clear Cart
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+    let originalData = {};
+
+    function loadProfile() {
+      const user = getUser();
+      if (!user) {
+        document.getElementById('notLoggedIn').style.display = 'block';
+        document.getElementById('profileContent').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('notLoggedIn').style.display = 'none';
+      document.getElementById('profileContent').style.display = 'block';
+
+      // Avatar
+      const avatar = document.getElementById('profileAvatar');
+      if (user.photo) {
+        avatar.innerHTML = `<img src="${user.photo}" alt="${user.name}" onerror="this.parentElement.textContent='${(user.name||'U')[0].toUpperCase()}'">`;
+      } else {
+        avatar.textContent = (user.name || 'U')[0].toUpperCase();
+      }
+
+      // Header info
+      document.getElementById('profileDisplayName').textContent = user.name || 'User';
+      document.getElementById('profileDisplayEmail').textContent = user.email || '';
+      document.getElementById('profileRole').textContent = (user.role || 'customer').charAt(0).toUpperCase() + (user.role || 'customer').slice(1);
+
+      // Form fields
+      document.getElementById('profileName').value = user.name || '';
+      document.getElementById('profileEmail').value = user.email || '';
+      document.getElementById('profilePhone').value = user.phone || '';
+      document.getElementById('profileAddress').value = user.address || '';
+      document.getElementById('profileProvider').value = user.provider === 'google' ? '🔗 Google Account' : '🔑 Email & Password';
+
+      // Save original for reset
+      originalData = { name: user.name || '', email: user.email || '', phone: user.phone || '', address: user.address || '' };
+
+      // Stats (fetched from API)
+      loadStats();
+    }
+
+    async function loadStats() {
+      const token = getToken();
+      let orders = 0, spent = 0;
+
+      if (token) {
+        try {
+          const r = await fetch(`${API}/orders`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (r.ok) {
+            const d = await r.json();
+            orders = d.orders?.length || 0;
+            spent = d.orders?.reduce((s, o) => s + (o.final_amount || o.total_amount || 0), 0) || 0;
+          }
+        } catch {}
+      }
+
+
+
+      document.getElementById('statOrders').textContent = orders;
+      document.getElementById('statSpent').textContent = `₹${spent.toLocaleString('en-IN')}`;
+
+      const user = getUser();
+      if (user?.created_at) {
+        const d = new Date(user.created_at);
+        document.getElementById('statSince').textContent = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+      } else {
+        document.getElementById('statSince').textContent = 'Apr 2026';
+      }
+    }
+
+    // Save profile
+    document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+      const updated = {
+        name: document.getElementById('profileName').value.trim(),
+        email: document.getElementById('profileEmail').value.trim(),
+        phone: document.getElementById('profilePhone').value.trim(),
+        address: document.getElementById('profileAddress').value.trim()
+      };
+
+      // Try updating via API
+      const token = getToken();
+      if (token) {
+        try {
+          await fetch(`${API}/auth/profile`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(updated)
+          });
+        } catch {}
+      }
+
+      // Update local storage
+      const user = getUser();
+      setUser({ ...user, ...updated });
+      originalData = { ...updated };
+
+      // Update header
+      document.getElementById('profileDisplayName').textContent = updated.name;
+      document.getElementById('profileDisplayEmail').textContent = updated.email;
+
+      // Update avatar initial if no photo
+      if (!user?.photo) {
+        document.getElementById('profileAvatar').textContent = (updated.name || 'U')[0].toUpperCase();
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+
+      const indicator = document.getElementById('saveIndicator');
+      indicator.classList.add('visible');
+      setTimeout(() => indicator.classList.remove('visible'), 2500);
+      showToast('Profile updated successfully! ✅');
+    });
+
+    // Reset form
+    document.getElementById('resetBtn')?.addEventListener('click', () => {
+      document.getElementById('profileName').value = originalData.name;
+      document.getElementById('profileEmail').value = originalData.email;
+      document.getElementById('profilePhone').value = originalData.phone;
+      document.getElementById('profileAddress').value = originalData.address;
+      showToast('Changes reverted');
+    });
+
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+      logout();
+    });
+
+    // Clear cart
+    document.getElementById('clearCartBtn')?.addEventListener('click', () => {
+      if (confirm('Clear all items from your cart?')) {
+        saveCart([]);
+        showToast('Cart cleared');
+      }
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>

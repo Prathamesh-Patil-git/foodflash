@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FoodFlash — Order delicious food from top restaurants near you. Fast delivery, great prices, and an AI-powered menu assistant.">
+  <title>FoodFlash — Order Food Online</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- ======= NAVBAR ======= -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-logo"><span>🍔</span> FoodFlash</a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="cart.html">Cart</a>
+        <a href="orders.html">My Orders</a>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
+        </button>
+        <a href="cart.html" class="btn-icon cart-btn" id="navCartBtn" aria-label="Cart">
+          <i class="fas fa-cart-shopping"></i>
+          <span class="cart-count" id="navCartCount">0</span>
+        </a>
+        <a href="login.html" class="btn btn-primary btn-sm" id="loginBtn">Login</a>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======= HERO ======= -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <img src="assets/images/hero-banner.png" alt="Delicious food spread">
+      <div></div>
+    </div>
+    <div class="container">
+      <div class="hero-content animate-in">
+        <div class="hero-tag">
+          <i class="fas fa-bolt"></i> Lightning-fast delivery in 30 mins
+        </div>
+        <h1>Craving Something <span class="highlight">Delicious?</span></h1>
+        <p>Welcome to FoodFlash — your favourite restaurant's own ordering platform. Fresh food, fast delivery, and an AI chatbot that knows exactly what you want.</p>
+        <div class="hero-actions">
+          <a href="menu.html" class="btn btn-primary btn-lg">
+            <i class="fas fa-utensils"></i> Explore Menu
+          </a>
+          <a href="#featured" class="btn btn-secondary btn-lg">
+            <i class="fas fa-fire"></i> What's Popular
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-value" id="heroMenuCount">—</div>
+            <div class="hero-stat-label">Menu Items</div>
+          </div>
+          <div>
+            <div class="hero-stat-value" id="heroOrderCount">—</div>
+            <div class="hero-stat-label">Orders Served</div>
+          </div>
+          <div>
+            <div class="hero-stat-value" id="heroCustomerCount">—</div>
+            <div class="hero-stat-label">Happy Customers</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">30</div>
+            <div class="hero-stat-label">Min Delivery</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= HOW IT WORKS ======= -->
+  <section class="section" id="howItWorks">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Three simple steps to your next great meal</p>
+      <div class="food-grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));">
+        <div class="card" style="padding:36px; text-align:center;">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,107,53,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;color:var(--accent-orange);">
+            <i class="fas fa-search"></i>
+          </div>
+          <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:8px;">Browse & Discover</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;">Explore restaurants, filter by cuisine, or ask our AI chatbot for recommendations.</p>
+        </div>
+        <div class="card" style="padding:36px; text-align:center;">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(6,214,160,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;color:var(--accent-green);">
+            <i class="fas fa-cart-plus"></i>
+          </div>
+          <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:8px;">Add to Cart & Pay</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;">Build your order, apply coupons, and pay securely via Razorpay.</p>
+        </div>
+        <div class="card" style="padding:36px; text-align:center;">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,209,102,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;color:var(--accent-gold);">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:8px;">Track & Enjoy</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;">Real-time order tracking from kitchen to your doorstep. Bon appétit!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= FEATURED DISHES ======= -->
+  <section class="section" id="featured" style="background:var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-title">🔥 Trending Right Now</h2>
+      <p class="section-subtitle">Most ordered dishes this week</p>
+      <div class="food-grid" id="featuredGrid">
+        <!-- JS will populate, but here's static fallback -->
+        <div class="food-card">
+          <div class="food-card-img">
+            <img src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&h=300&fit=crop" alt="Butter Chicken">
+            <div class="food-card-badges">
+              <span class="badge badge-nonveg"><i class="fas fa-circle" style="font-size:6px;"></i> Non-Veg</span>
+              <span class="badge badge-popular"><i class="fas fa-fire"></i> Popular</span>
+            </div>
+          </div>
+          <div class="food-card-body">
+            <div class="food-card-name">Butter Chicken</div>
+            <div class="food-card-restaurant">Punjab Grill • North Indian</div>
+            <div class="food-card-footer">
+              <div class="food-card-price">₹349</div>
+              <div class="food-card-rating"><i class="fas fa-star"></i> 4.8</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px;" onclick="addToCart(1)">
+              <i class="fas fa-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <div class="food-card">
+          <div class="food-card-img">
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop" alt="Margherita Pizza">
+            <div class="food-card-badges">
+              <span class="badge badge-veg"><i class="fas fa-leaf" style="font-size:8px;"></i> Veg</span>
+              <span class="badge badge-popular"><i class="fas fa-fire"></i> Popular</span>
+            </div>
+          </div>
+          <div class="food-card-body">
+            <div class="food-card-name">Margherita Pizza</div>
+            <div class="food-card-restaurant">Pizza Palace • Italian</div>
+            <div class="food-card-footer">
+              <div class="food-card-price">₹299</div>
+              <div class="food-card-rating"><i class="fas fa-star"></i> 4.7</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px;" onclick="addToCart(2)">
+              <i class="fas fa-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <div class="food-card">
+          <div class="food-card-img">
+            <img src="https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=400&h=300&fit=crop" alt="Hyderabadi Biryani">
+            <div class="food-card-badges">
+              <span class="badge badge-nonveg"><i class="fas fa-circle" style="font-size:6px;"></i> Non-Veg</span>
+            </div>
+          </div>
+          <div class="food-card-body">
+            <div class="food-card-name">Hyderabadi Biryani</div>
+            <div class="food-card-restaurant">Biryani House • Mughlai</div>
+            <div class="food-card-footer">
+              <div class="food-card-price">₹279</div>
+              <div class="food-card-rating"><i class="fas fa-star"></i> 4.9</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px;" onclick="addToCart(3)">
+              <i class="fas fa-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <div class="food-card">
+          <div class="food-card-img">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop" alt="Classic Burger">
+            <div class="food-card-badges">
+              <span class="badge badge-nonveg"><i class="fas fa-circle" style="font-size:6px;"></i> Non-Veg</span>
+            </div>
+          </div>
+          <div class="food-card-body">
+            <div class="food-card-name">Classic Smash Burger</div>
+            <div class="food-card-restaurant">Burger Barn • American</div>
+            <div class="food-card-footer">
+              <div class="food-card-price">₹199</div>
+              <div class="food-card-rating"><i class="fas fa-star"></i> 4.6</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px;" onclick="addToCart(4)">
+              <i class="fas fa-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:48px;">
+        <a href="menu.html" class="btn btn-secondary btn-lg">View Full Menu <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ======= AI CHATBOT CTA ======= -->
+  <section class="section" style="background:var(--bg-secondary);">
+    <div class="container" style="text-align:center;">
+      <h2 class="section-title">🤖 Meet Your AI Food Assistant</h2>
+      <p class="section-subtitle" style="max-width:560px;margin-left:auto;margin-right:auto;">
+        Powered by Gemini AI & ChromaDB. Ask anything — "Show me veg options under ₹200" or "What's the best biryani?"
+      </p>
+      <div class="card" style="max-width:480px;margin:0 auto;padding:24px;">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="chat-msg bot">Hey! 👋 I'm FoodFlash AI. What are you craving today?</div>
+          <div class="chat-msg user">Show me popular veg pizzas</div>
+          <div class="chat-msg bot">Here are 3 top-rated veg pizzas: 🍕 Margherita (₹299), Farm Fresh (₹329), Paneer Tikka (₹349). Want me to add one to your cart?</div>
+        </div>
+      </div>
+      <p style="color:var(--text-muted);margin-top:24px;font-size:0.85rem;">Click the orange chat button in the corner to try it out →</p>
+    </div>
+  </section>
+
+  <!-- ======= FOOTER ======= -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo" style="font-size:1.3rem;"><span>🍔</span> FoodFlash</div>
+          <p>Your favourite food, delivered fast. Built with Flask, MySQL, Redis & AI as a DBMS Mini Project.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <a href="menu.html">Menu</a>
+          <a href="cart.html">Cart</a>
+          <a href="orders.html">My Orders</a>
+          <a href="login.html">Login</a>
+        </div>
+        <div class="footer-col">
+          <h4>Cuisines</h4>
+          <a href="#">North Indian</a>
+          <a href="#">Italian</a>
+          <a href="#">Chinese</a>
+          <a href="#">South Indian</a>
+        </div>
+        <div class="footer-col">
+          <h4>Tech Stack</h4>
+          <a href="#">Flask REST API</a>
+          <a href="#">MySQL 8.0</a>
+          <a href="#">Redis</a>
+          <a href="#">ChromaDB + Gemini</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 FoodFlash. DBMS Mini Project — SY IoT Semester 4.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======= CHATBOT WIDGET ======= -->
+  <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open AI Chatbot">
+    <i class="fas fa-comment-dots"></i>
+  </button>
+  <div class="chatbot-window" id="chatbotWindow">
+    <div class="chatbot-header">
+      <h4><i class="fas fa-robot"></i> FoodFlash AI</h4>
+      <p>Powered by Gemini + ChromaDB</p>
+    </div>
+    <div class="chatbot-messages" id="chatMessages">
+      <div class="chat-msg bot">Hey! 👋 I can help you find the perfect dish. Try asking "best biryani" or "veg options under ₹200".</div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" id="chatInput" placeholder="Ask me anything about food...">
+      <button id="chatSend" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script>
+    // Fetch live stats for hero section from database
+    (async () => {
+      const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+      try {
+        const r = await fetch(`${API}/public/stats`);
+        if (r.ok) {
+          const d = await r.json();
+          document.getElementById('heroMenuCount').textContent = (d.menu_items || 0) + '+';
+          document.getElementById('heroOrderCount').textContent = (d.orders_served || 0) + '+';
+          document.getElementById('heroCustomerCount').textContent = (d.customers || 0) + '+';
+        }
+      } catch {}
+    })();
+  </script>
+</body>
+</html>

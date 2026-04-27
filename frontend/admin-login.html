@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FoodFlash Admin Panel — Login to manage restaurants, orders, and analytics.">
+  <title>Admin Login — FoodFlash</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .admin-login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      position: relative;
+      overflow: hidden;
+    }
+    .admin-login-page::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,53,0.15), transparent 70%);
+      pointer-events: none;
+    }
+    .admin-login-page::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -100px;
+      width: 350px; height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6,214,160,0.1), transparent 70%);
+      pointer-events: none;
+    }
+    .admin-login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 440px;
+      width: 90%;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 50px;
+      background: rgba(255,107,53,0.12);
+      color: var(--accent-orange);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .admin-login-card h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .admin-login-card .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+    .admin-login-card .form-group {
+      margin-bottom: 20px;
+    }
+    .admin-login-card label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+    .admin-login-card .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-glass);
+      background: var(--bg-glass);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .admin-login-card .form-input:focus {
+      outline: none;
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(255,107,53,0.15);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-orange), #ff8c42);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s, box-shadow 0.2s;
+      margin-top: 8px;
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,107,53,0.3);
+    }
+    .login-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent-orange); }
+    .error-msg {
+      background: rgba(231,76,60,0.12);
+      color: #e74c3c;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-msg.show { display: flex; }
+    .lock-icon {
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,107,53,0.05));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: var(--accent-orange);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-login-page">
+    <div class="admin-login-card">
+      <div class="lock-icon"><i class="fas fa-shield-halved"></i></div>
+      <div class="admin-badge"><i class="fas fa-lock"></i> Admin Access</div>
+      <h2>Admin Panel</h2>
+      <p class="subtitle">Sign in with your admin or restaurant credentials</p>
+
+      <div class="error-msg" id="errorMsg">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText">Invalid credentials</span>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label for="adminEmail"><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" id="adminEmail" class="form-input" placeholder="admin@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="adminPassword"><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="adminPassword" class="form-input" placeholder="Enter admin password" required>
+        </div>
+        <button type="submit" class="login-btn" id="adminLoginBtn">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+      </form>
+
+      <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to FoodFlash</a>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const API = window.FOODFLASH_API || 'http://localhost:5000/api';
+
+    // If already logged in as admin, redirect
+    (function() {
+      const user = JSON.parse(localStorage.getItem('foodflash_user') || 'null');
+      if (user && ['admin', 'restaurant'].includes(user.role)) {
+        window.location.href = 'admin.html';
+      }
+    })();
+
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      const btn = document.getElementById('adminLoginBtn');
+      const errorDiv = document.getElementById('errorMsg');
+      const errorText = document.getElementById('errorText');
+
+      errorDiv.classList.remove('show');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+      try {
+        const res = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Invalid email or password');
+        }
+
+        // Check if user has admin or restaurant role
+        if (!['admin', 'restaurant'].includes(data.user.role)) {
+          throw new Error('Access denied. This login is for admin and restaurant accounts only.');
+        }
+
+        // Store auth data
+        localStorage.setItem('foodflash_token', data.token);
+        localStorage.setItem('foodflash_user', JSON.stringify(data.user));
+
+        showToast('Admin login successful! Redirecting...');
+        setTimeout(() => { window.location.href = 'admin.html'; }, 800);
+
+      } catch (err) {
+        errorText.textContent = err.message;
+        errorDiv.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Dashboard';
+      }
+    });
+  </script>
+</body>
+</html>

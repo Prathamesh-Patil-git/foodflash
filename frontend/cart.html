@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your FoodFlash shopping cart. Review items, adjust quantities, and proceed to checkout.">
+  <title>Cart — FoodFlash</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-logo"><span>🍔</span> FoodFlash</a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a><a href="menu.html">Menu</a>
+        <a href="cart.html" class="active">Cart</a><a href="orders.html">My Orders</a>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
+        </button>
+        <a href="cart.html" class="btn-icon cart-btn"><i class="fas fa-cart-shopping"></i><span class="cart-count" id="navCartCount">0</span></a>
+        <a href="login.html" class="btn btn-primary btn-sm">Login</a>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="section" style="padding-top:120px;">
+    <div class="container">
+      <h1 class="section-title">Your Cart</h1>
+      <p class="section-subtitle" id="cartSubtitle">Review your items before checkout</p>
+
+      <!-- Empty state -->
+      <div id="emptyCart" style="display:none;text-align:center;padding:80px 0;">
+        <div style="font-size:4rem;margin-bottom:20px;">🛒</div>
+        <h2 style="margin-bottom:12px;">Your cart is empty</h2>
+        <p style="color:var(--text-muted);margin-bottom:32px;">Add some delicious dishes from our menu!</p>
+        <a href="menu.html" class="btn btn-primary btn-lg"><i class="fas fa-utensils"></i> Browse Menu</a>
+      </div>
+
+      <!-- Cart content -->
+      <div class="cart-container" id="cartContent" style="display:none;">
+        <div>
+          <div class="cart-items" id="cartItemsList"></div>
+        </div>
+        <div class="cart-summary" id="cartSummary">
+          <h3>Order Summary</h3>
+          <div class="cart-summary-row"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+          <div class="cart-summary-row"><span>Taxes (5% GST)</span><span id="taxes">₹0</span></div>
+          <div style="margin:20px 0;">
+            <div class="search-bar" style="margin-bottom:0;max-width:100%;padding:10px 16px;">
+              <i class="fas fa-tag search-icon"></i>
+              <input type="text" id="couponInput" placeholder="Enter coupon code">
+              <button class="btn btn-sm btn-secondary" id="applyCoupon">Apply</button>
+            </div>
+          </div>
+          <div class="cart-summary-row" id="discountRow" style="display:none;color:var(--accent-green);">
+            <span>Discount</span><span id="discount">-₹0</span>
+          </div>
+          <div class="cart-summary-row total"><span>Total</span><span id="totalAmount">₹0</span></div>
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:20px;" id="checkoutBtn">
+            <i class="fas fa-lock"></i> Proceed to Checkout
+          </button>
+          <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin-top:12px;">
+            <i class="fas fa-shield-alt"></i> Secured by Razorpay
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cart.js"></script>
+
+</body>
+</html>
