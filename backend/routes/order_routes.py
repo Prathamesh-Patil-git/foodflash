@@ -59,7 +59,6 @@ def place_order():
                 'id': order_id,
                 'total_amount': float(total),
                 'tax_amount': float(tax),
-                'delivery_fee': float(delivery_fee),
                 'discount': float(discount),
                 'final_amount': float(final_amount),
                 'status': 'placed'

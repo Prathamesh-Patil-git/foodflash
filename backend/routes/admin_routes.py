@@ -147,7 +147,6 @@ def clear_all_customers():
         cursor.execute("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE user_id IN (SELECT id FROM users WHERE role = 'customer'))")
         cursor.execute("DELETE FROM order_items WHERE order_id IN (SELECT id FROM orders WHERE user_id IN (SELECT id FROM users WHERE role = 'customer'))")
         cursor.execute("DELETE FROM orders WHERE user_id IN (SELECT id FROM users WHERE role = 'customer')")
-        cursor.execute("DELETE FROM reviews WHERE user_id IN (SELECT id FROM users WHERE role = 'customer')")
         cursor.execute("DELETE FROM users WHERE role = 'customer'")
         conn.commit()
         return jsonify({'message': 'All customer accounts and their data deleted'})
