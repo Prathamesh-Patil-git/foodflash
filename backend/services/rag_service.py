@@ -5,29 +5,37 @@ from utils.db import execute_query
 
 
 class RAGService:
-    """RAG Service using ChromaDB + Gemini (Unit IV - Vector DB)."""
+    """
+    Service layer implementing Retrieval-Augmented Generation (RAG).
+    Integrates ChromaDB for semantic vector search and Google's Gemini API 
+    for natural language response generation based on queried menu items.
+    """
 
     def __init__(self):
-        # ChromaDB local persistent client
+        # Initialize persistent vector database client for local storage
         self.chroma_client = chromadb.PersistentClient(path=Config.CHROMA_PERSIST_DIR)
         self.collection = self.chroma_client.get_or_create_collection(
             name="menu_items",
             metadata={"description": "FoodFlash menu items for semantic search"}
         )
 
-        # Gemini AI setup
+        # Configure Generative AI model client using configured API key
         if Config.GEMINI_API_KEY:
             genai.configure(api_key=Config.GEMINI_API_KEY)
             self.model = genai.GenerativeModel('gemini-flash-latest')
         else:
             self.model = None
 
-        # Seed embeddings if collection is empty
+        # Automatically populate the vector database on startup if empty
         if self.collection.count() == 0:
             self._seed_embeddings()
 
     def _seed_embeddings(self):
-        """Seed menu items into ChromaDB as vector embeddings."""
+        """
+        Extracts menu items from the relational database and ingests them 
+        into ChromaDB. Creates vector embeddings from concatenated textual 
+        representations of menu records to enable semantic search capabilities.
+        """
         try:
             items = execute_query("SELECT * FROM vw_menu_full")
             if not items:
@@ -62,18 +70,25 @@ class RAGService:
             print(f"Error seeding ChromaDB: {e}")
 
     def query(self, user_query, n_results=5):
-        """Query menu using semantic search + Gemini RAG."""
-        # Step 1: Retrieve similar items from ChromaDB
+        """
+        Processes a user query by searching the vector database for relevant 
+        menu items and generating a contextualized response using the LLM.
+        
+        Args:
+            user_query (str): The natural language query from the user.
+            n_results (int): Number of nearest neighbor documents to retrieve.
+        """
+        # Step 1: Execute similarity search against the embedded document collection
         results = self.collection.query(query_texts=[user_query], n_results=n_results)
 
         if not results['documents'][0]:
             return "I couldn't find any matching dishes. Try asking about a specific cuisine or dish!"
 
-        # Build context from retrieved documents
+        # Construct the context window for the LLM using the retrieved documents
         context = "\n".join(results['documents'][0])
         metadatas = results['metadatas'][0]
 
-        # Step 2: Generate response with Gemini (or fallback)
+        # Step 2: Inject context into the prompt template and call the LLM endpoint
         if self.model:
             prompt = f"""You are FoodFlash AI, a friendly food ordering assistant.
 Based on these menu items from our database:
@@ -99,6 +114,9 @@ Rules:
             return self._fallback_response(metadatas)
 
     def _fallback_response(self, metadatas):
-        """Fallback when Gemini is unavailable."""
+        """
+        Provides a static programmatic response when the LLM service is unreachable
+        or disabled, utilizing only the metadata from the vector search results.
+        """
         items = [f"🍽️ {m['name']} (₹{m['price']}) from {m['restaurant']}" for m in metadatas[:3]]
         return "Here's what I found:\n" + "\n".join(items)

@@ -6,7 +6,10 @@ menu_bp = Blueprint('menu', __name__)
 
 @menu_bp.route('/restaurants', methods=['GET'])
 def get_restaurants():
-    """List all active restaurants."""
+    """
+    Queries and returns a list of all non-deleted, active restaurants,
+    ordered descending by their average customer rating.
+    """
     restaurants = execute_query(
         "SELECT * FROM restaurants WHERE is_active = TRUE ORDER BY rating DESC"
     )
@@ -15,7 +18,11 @@ def get_restaurants():
 
 @menu_bp.route('/menu', methods=['GET'])
 def get_menu():
-    """List menu items with optional filters."""
+    """
+    Retrieves menu items dynamically based on provided query parameters 
+    (category, vegetarian status, search term, restaurant ID). Constructs a 
+    parameterized SQL query to filter results and prevent SQL injection.
+    """
     category = request.args.get('category')
     veg = request.args.get('veg')
     search = request.args.get('search')
@@ -44,7 +51,10 @@ def get_menu():
 
 @menu_bp.route('/menu/<int:item_id>', methods=['GET'])
 def get_menu_item(item_id):
-    """Get a single menu item by ID."""
+    """
+    Fetches the complete details for a specific menu item using its unique 
+    identifier from the vw_menu_full view.
+    """
     items = execute_query(
         "SELECT * FROM vw_menu_full WHERE id = %s", (item_id,)
     )
@@ -55,7 +65,11 @@ def get_menu_item(item_id):
 
 @menu_bp.route('/public/stats', methods=['GET'])
 def get_public_stats():
-    """Public stats for the homepage hero — no auth required."""
+    """
+    Aggregates high-level platform statistics (total active menu items, total 
+    completed orders, unique customers) for display on public-facing marketing pages.
+    Requires no authentication.
+    """
     menu_items = execute_query("SELECT COUNT(*) AS cnt FROM menu_items WHERE is_available = TRUE")
     orders = execute_query("SELECT COUNT(*) AS cnt FROM orders WHERE status != 'cancelled'")
     customers = execute_query("SELECT COUNT(DISTINCT user_id) AS cnt FROM orders")

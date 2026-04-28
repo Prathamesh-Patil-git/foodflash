@@ -1,6 +1,7 @@
 """
-FoodFlash — Flask Backend Entry Point
-DBMS Mini Project | SY IoT Semester 4
+FoodFlash API — Application Entry Point
+Initializes the Flask web server, registers domain-specific API blueprints, 
+configures Cross-Origin Resource Sharing (CORS), and serves static frontend assets.
 """
 import os
 from flask import Flask, send_from_directory

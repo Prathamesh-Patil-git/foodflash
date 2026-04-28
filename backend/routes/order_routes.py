@@ -9,7 +9,12 @@ order_bp = Blueprint('orders', __name__)
 @order_bp.route('', methods=['POST'])
 @token_required
 def place_order():
-    """Place a new order using ACID transaction."""
+    """
+    Executes a multi-step ACID transaction to finalize a new order.
+    Calculates totals and taxes, inserts the parent order record, iterates to insert 
+    individual order items, provisions an initial payment record, and finally commits 
+    the transaction. Automatically rolls back all changes on any failure.
+    """
     data = request.get_json()
     restaurant_id = data.get('restaurant_id', 1)
     items = data.get('items', [])  # [{"menu_item_id":1, "quantity":2, "unit_price":349}]
@@ -76,7 +81,10 @@ def place_order():
 @order_bp.route('', methods=['GET'])
 @token_required
 def get_orders():
-    """Get user's order history."""
+    """
+    Retrieves a chronological list of historical orders for the authenticated user,
+    subsequently querying and appending detailed item records for each parent order.
+    """
     orders = execute_query(
         """SELECT o.*, r.name AS restaurant_name
            FROM orders o
@@ -103,7 +111,10 @@ def get_orders():
 @order_bp.route('/<int:order_id>', methods=['GET'])
 @token_required
 def get_order(order_id):
-    """Get single order details."""
+    """
+    Fetches the complete breakdown of a specific order, including restaurant details 
+    and individual itemized products, ensuring the requestor is the owner of the order.
+    """
     orders = execute_query(
         """SELECT o.*, r.name AS restaurant_name
            FROM orders o JOIN restaurants r ON o.restaurant_id = r.id
@@ -126,12 +137,11 @@ def get_order(order_id):
 @order_bp.route('/<int:order_id>/cancel', methods=['PUT'])
 @token_required
 def cancel_order(order_id):
-    """Cancel an order with ACID transaction.
-    - Only allowed if status is before 'food_prepared'
-    - Atomically: updates order status to cancelled + refunds payment
-    - Demonstrates ACID: Atomicity (both update or neither),
-      Consistency (trigger prevents cancelling delivered orders),
-      Isolation (row-level locks), Durability (commit to disk)
+    """
+    Atomically cancels an active order and marks its associated payment as refunded.
+    Uses row-level locking (SELECT FOR UPDATE) to prevent race conditions and validates 
+    the current order status to enforce business rules (cannot cancel if food is prepared).
+    Fully implements ACID principles to ensure data consistency during cancellations.
     """
     conn = get_db()
     cursor = conn.cursor(dictionary=True)

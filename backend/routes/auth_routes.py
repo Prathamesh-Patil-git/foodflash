@@ -7,7 +7,11 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    """Register a new user."""
+    """
+    Handles new customer registration. 
+    Validates uniqueness of email, securely hashes the password, inserts the user 
+    record, and provisions a JWT session token for immediate login.
+    """
     data = request.get_json()
     name = data.get('name')
     email = data.get('email')
@@ -39,7 +43,11 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    """Login and get JWT token."""
+    """
+    Authenticates user credentials.
+    Verifies the provided plaintext password against the hashed database record 
+    and generates a JWT session token containing user roles and metadata upon success.
+    """
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -73,7 +81,10 @@ def login():
 @auth_bp.route('/profile', methods=['GET'])
 @token_required
 def get_profile():
-    """Get current user's profile."""
+    """
+    Retrieves the authenticated user's profile information.
+    Queries the users table using the user ID extracted from the validated JWT token.
+    """
     users = execute_query(
         "SELECT id, name, email, phone, role, created_at FROM users WHERE id = %s",
         (request.user_id,)
@@ -86,7 +97,11 @@ def get_profile():
 @auth_bp.route('/profile', methods=['PUT'])
 @token_required
 def update_profile():
-    """Update current user's profile."""
+    """
+    Updates the authenticated user's profile information.
+    Enforces unique constraints on the email field to prevent duplication across 
+    different user accounts before executing the UPDATE statement.
+    """
     data = request.get_json()
     name = data.get('name')
     email = data.get('email')

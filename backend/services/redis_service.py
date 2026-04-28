@@ -4,7 +4,11 @@ from config import Config
 
 
 class RedisService:
-    """Redis service for cart management and caching (Unit III - NoSQL)."""
+    """
+    Service layer for interacting with Redis cache and temporary data storage.
+    Handles user session carts and provides application-wide caching to reduce 
+    database load. Implements a fallback in-memory mock if Redis is unavailable.
+    """
     _mock_db = {}  # In-memory fallback if Redis is not installed
 
     def __init__(self):

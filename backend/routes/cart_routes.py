@@ -10,7 +10,10 @@ redis_svc = RedisService()
 @cart_bp.route('', methods=['GET'])
 @token_required
 def get_cart():
-    """Get all items in the user's cart."""
+    """
+    Retrieves the current state of the user's shopping cart.
+    Fetches the deserialized list of items from the Redis key-value store cache layer.
+    """
     cart = redis_svc.get_cart(request.user_id)
     return jsonify({'cart': cart})
 
@@ -18,7 +21,11 @@ def get_cart():
 @cart_bp.route('', methods=['POST'])
 @token_required
 def add_to_cart():
-    """Add an item to cart."""
+    """
+    Appends a new menu item to the user's session cart.
+    Interfaces with the Redis service to store item data temporarily, automatically 
+    incrementing quantities if the item already exists in the cart.
+    """
     data = request.get_json()
     item_id = data.get('item_id')
     quantity = data.get('quantity', 1)
@@ -35,7 +42,11 @@ def add_to_cart():
 @cart_bp.route('/<int:item_id>', methods=['PUT'])
 @token_required
 def update_cart_item(item_id):
-    """Update item quantity in cart."""
+    """
+    Modifies the quantity of a specific item within the cart.
+    Updates the Redis hash field for the given item. If the specified quantity 
+    is set to 0 or less, the item is entirely removed from the cart.
+    """
     data = request.get_json()
     quantity = data.get('quantity', 1)
 
@@ -51,7 +62,10 @@ def update_cart_item(item_id):
 @cart_bp.route('/<int:item_id>', methods=['DELETE'])
 @token_required
 def remove_from_cart(item_id):
-    """Remove an item from cart."""
+    """
+    Deletes a specific item entirely from the user's Redis session cart,
+    regardless of its current quantity.
+    """
     redis_svc.remove_from_cart(request.user_id, item_id)
     cart = redis_svc.get_cart(request.user_id)
     return jsonify({'message': 'Item removed', 'cart': cart})
@@ -60,6 +74,9 @@ def remove_from_cart(item_id):
 @cart_bp.route('/clear', methods=['DELETE'])
 @token_required
 def clear_cart():
-    """Clear entire cart."""
+    """
+    Purges all items from the user's cart by deleting the associated 
+    session key from the Redis datastore.
+    """
     redis_svc.clear_cart(request.user_id)
     return jsonify({'message': 'Cart cleared', 'cart': []})

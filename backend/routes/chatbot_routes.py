@@ -13,7 +13,12 @@ except ImportError:
 
 @chatbot_bp.route('', methods=['POST'])
 def chat():
-    """Handle chatbot query using RAG (ChromaDB + Gemini)."""
+    """
+    Endpoint for processing natural language customer queries via the AI chatbot.
+    Receives a JSON payload with the user 'query', invokes the RAG service to find
+    relevant menu context, and returns a generated contextual response.
+    Returns HTTP 400 if the query parameter is missing or empty.
+    """
     data = request.get_json()
     query = data.get('query', '')
 
