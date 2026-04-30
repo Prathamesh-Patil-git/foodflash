@@ -24,8 +24,8 @@ function renderMenu(items) {
   if (!items.length) { menuGrid.innerHTML=''; if(noResults) noResults.style.display='block'; return; }
   if(noResults) noResults.style.display='none';
   menuGrid.innerHTML = items.map(item => {
-    const v = item.is_veg ?? item.veg, rest = item.restaurant_name||item.restaurant;
-    const rat = item.restaurant_rating||item.rating||4.0, img = item.image_url||item.img;
+    const v = item.is_veg ?? item.veg;
+    const img = item.image_url||item.img;
     return `<div class="food-card" data-id="${item.id}">
       <div class="food-card-img">
         <img src="${img}" alt="${item.name}" loading="lazy"
@@ -34,15 +34,14 @@ function renderMenu(items) {
           <span class="badge ${v?'badge-veg':'badge-nonveg'}">
             <i class="fas ${v?'fa-leaf':'fa-circle'}" style="font-size:${v?8:6}px;"></i> ${v?'Veg':'Non-Veg'}
           </span>
-          ${rat>=4.7?'<span class="badge badge-popular"><i class="fas fa-fire"></i> Popular</span>':''}
+
         </div>
       </div>
       <div class="food-card-body">
         <div class="food-card-name">${item.name}</div>
-        <div class="food-card-restaurant">${rest}</div>
+        <div class="food-card-restaurant">FoodFlash Kitchen</div>
         <div class="food-card-footer">
           <div class="food-card-price">₹${item.price}</div>
-          <div class="food-card-rating"><i class="fas fa-star"></i> ${rat}</div>
         </div>
         <button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px;" onclick="handleAddToCart(${item.id})">
           <i class="fas fa-plus"></i> Add to Cart
@@ -57,7 +56,7 @@ function filterMenu() {
   let f = allMenuItems;
   if (activeCategory==='veg') f = f.filter(i=>i.is_veg??i.veg);
   else if (activeCategory!=='all') f = f.filter(i=>i.category===activeCategory);
-  if (s) f = f.filter(i=>i.name.toLowerCase().includes(s)||(i.restaurant_name||i.restaurant||'').toLowerCase().includes(s));
+  if (s) f = f.filter(i=>i.name.toLowerCase().includes(s));
   renderMenu(f);
 }
 
@@ -67,7 +66,7 @@ async function handleAddToCart(id) {
   const token = localStorage.getItem('foodflash_token');
   
   // Always save to localStorage as well for the cart page
-  const cartItem = { id:item.id, name:item.name, price:item.price, restaurant:item.restaurant_name||item.restaurant||'FoodFlash', restaurant_id:item.restaurant_id||1, img:item.image_url||item.img||'', veg:item.is_veg??item.veg??false };
+  const cartItem = { id:item.id, name:item.name, price:item.price, restaurant:'FoodFlash Kitchen', img:item.image_url||item.img||'', veg:item.is_veg??item.veg??false };
   const cart = JSON.parse(localStorage.getItem('foodflash_cart') || '[]');
   const existing = cart.find(c => c.id === id);
   if (existing) { existing.qty = (existing.qty || 1) + 1; }

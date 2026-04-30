@@ -14,12 +14,6 @@ class Config:
     MYSQL_USER = os.getenv('MYSQL_USER', 'root')
     MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
     MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'foodflash')
-
-    # Redis
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
-    REDIS_DB = int(os.getenv('REDIS_DB', 0))
-
     # JWT
     JWT_SECRET = os.getenv('JWT_SECRET', 'foodflash-jwt-secret')
     JWT_EXPIRY_HOURS = int(os.getenv('JWT_EXPIRY_HOURS', 24))

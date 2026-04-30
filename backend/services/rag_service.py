@@ -48,7 +48,6 @@ class RAGService:
             for item in items:
                 doc = (
                     f"{item['name']} - {item['description'] or ''} | "
-                    f"Restaurant: {item['restaurant_name']} | "
                     f"Category: {item['category']} | "
                     f"Price: ₹{item['price']} | "
                     f"{'Vegetarian' if item['is_veg'] else 'Non-Vegetarian'}"
@@ -59,8 +58,7 @@ class RAGService:
                     'name': item['name'],
                     'price': float(item['price']),
                     'is_veg': item['is_veg'],
-                    'category': item['category'],
-                    'restaurant': item['restaurant_name']
+                    'category': item['category']
                 })
                 ids.append(f"menu_{item['id']}")
 
@@ -118,5 +116,5 @@ Rules:
         Provides a static programmatic response when the LLM service is unreachable
         or disabled, utilizing only the metadata from the vector search results.
         """
-        items = [f"🍽️ {m['name']} (₹{m['price']}) from {m['restaurant']}" for m in metadatas[:3]]
+        items = [f"🍽️ {m['name']} (₹{m['price']})" for m in metadatas[:3]]
         return "Here's what I found:\n" + "\n".join(items)

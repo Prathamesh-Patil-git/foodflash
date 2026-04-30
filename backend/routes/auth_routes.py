@@ -72,8 +72,7 @@ def login():
             'name': user['name'],
             'email': user['email'],
             'role': user['role'],
-            'phone': user['phone'],
-            'restaurant_id': user.get('restaurant_id')
+            'phone': user['phone']
         }
     })
 

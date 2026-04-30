@@ -17,7 +17,6 @@ DELIMITER //
 -- =============================================
 CREATE PROCEDURE place_order(
     IN p_user_id INT,
-    IN p_restaurant_id INT,
     IN p_items JSON,
     IN p_discount DECIMAL(10,2),
     OUT p_order_id INT,
@@ -44,9 +43,8 @@ BEGIN
     SET v_count = JSON_LENGTH(p_items);
 
     -- Step 1: Insert order (placeholder amounts)
-    INSERT INTO orders (user_id, restaurant_id, total_amount,
-                        tax_amount, discount, final_amount, status)
-    VALUES (p_user_id, p_restaurant_id, 0, 0, p_discount, 0, 'placed');
+    INSERT INTO orders (user_id, total_amount, tax_amount, discount, final_amount, status)
+    VALUES (p_user_id, 0, 0, p_discount, 0, 'placed');
 
     SET p_order_id = LAST_INSERT_ID();
 
@@ -127,8 +125,8 @@ END //
 
 -- =============================================
 -- PROCEDURE: update_order_status
--- Called by the restaurant dashboard to move
--- orders through the lifecycle.
+-- Called by the admin dashboard to move orders
+-- through the lifecycle.
 -- =============================================
 CREATE PROCEDURE update_order_status(
     IN p_order_id INT,
@@ -156,16 +154,11 @@ BEGIN
     SELECT COUNT(DISTINCT user_id) AS active_customers
     FROM orders;
 
-    -- Average restaurant rating
-    SELECT ROUND(AVG(rating), 1) AS avg_rating FROM restaurants;
-
     -- Top 5 selling items (JOIN + GROUP BY + ORDER BY)
-    SELECT mi.name, mi.image_url, r.name AS restaurant,
-           SUM(oi.quantity) AS total_sold
+    SELECT mi.name, mi.image_url, SUM(oi.quantity) AS total_sold
     FROM order_items oi
     JOIN menu_items mi ON oi.menu_item_id = mi.id
-    JOIN restaurants r ON mi.restaurant_id = r.id
-    GROUP BY mi.id, mi.name, mi.image_url, r.name
+    GROUP BY mi.id, mi.name, mi.image_url
     ORDER BY total_sold DESC
     LIMIT 5;
 END //
@@ -256,15 +249,13 @@ DELIMITER ;
 -- VIEWS (Virtual tables for common queries)
 -- =============================================
 
--- View: Order details with customer, restaurant, and payment info
+-- View: Order details with customer and payment info
 CREATE OR REPLACE VIEW vw_order_details AS
 SELECT
     o.id AS order_id,
     o.user_id,
     u.name AS customer_name,
     u.email AS customer_email,
-    r.name AS restaurant_name,
-    o.restaurant_id,
     o.total_amount, o.tax_amount,
     o.discount, o.final_amount, o.status,
     o.created_at,
@@ -273,16 +264,12 @@ SELECT
     p.razorpay_payment_id
 FROM orders o
 JOIN users u ON o.user_id = u.id
-JOIN restaurants r ON o.restaurant_id = r.id
 LEFT JOIN payments p ON o.id = p.order_id;
 
--- View: Menu items with restaurant info
+-- View: Menu items (all from the single restaurant)
 CREATE OR REPLACE VIEW vw_menu_full AS
 SELECT
-    mi.id, mi.name, mi.description, mi.price,
-    mi.category, mi.is_veg, mi.image_url, mi.is_available,
-    mi.restaurant_id,
-    r.name AS restaurant_name, r.cuisine, r.rating AS restaurant_rating
-FROM menu_items mi
-JOIN restaurants r ON mi.restaurant_id = r.id
-WHERE mi.is_available = TRUE AND r.is_active = TRUE;
+    id, name, description, price,
+    category, is_veg, image_url, is_available
+FROM menu_items
+WHERE is_available = TRUE;

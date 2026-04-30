@@ -1,10 +1,9 @@
-import json
 from flask import Blueprint, request, jsonify
-from services.redis_service import RedisService
+from services.cart_service import CartService
 from utils.auth import token_required
 
 cart_bp = Blueprint('cart', __name__)
-redis_svc = RedisService()
+cart_svc = CartService()
 
 
 @cart_bp.route('', methods=['GET'])
@@ -12,9 +11,9 @@ redis_svc = RedisService()
 def get_cart():
     """
     Retrieves the current state of the user's shopping cart.
-    Fetches the deserialized list of items from the Redis key-value store cache layer.
+    Fetches the list of items from the in-memory cart store.
     """
-    cart = redis_svc.get_cart(request.user_id)
+    cart = cart_svc.get_cart(request.user_id)
     return jsonify({'cart': cart})
 
 
@@ -23,19 +22,18 @@ def get_cart():
 def add_to_cart():
     """
     Appends a new menu item to the user's session cart.
-    Interfaces with the Redis service to store item data temporarily, automatically 
-    incrementing quantities if the item already exists in the cart.
+    Automatically increments quantity if the item already exists.
     """
     data = request.get_json()
     item_id = data.get('item_id')
     quantity = data.get('quantity', 1)
-    item_data = data.get('item_data', {})  # name, price, restaurant, img, veg
+    item_data = data.get('item_data', {})  # name, price, img, veg
 
     if not item_id:
         return jsonify({'error': 'item_id is required'}), 400
 
-    redis_svc.add_to_cart(request.user_id, item_id, quantity, item_data)
-    cart = redis_svc.get_cart(request.user_id)
+    cart_svc.add_to_cart(request.user_id, item_id, quantity, item_data)
+    cart = cart_svc.get_cart(request.user_id)
     return jsonify({'message': 'Item added to cart', 'cart': cart})
 
 
@@ -44,18 +42,17 @@ def add_to_cart():
 def update_cart_item(item_id):
     """
     Modifies the quantity of a specific item within the cart.
-    Updates the Redis hash field for the given item. If the specified quantity 
-    is set to 0 or less, the item is entirely removed from the cart.
+    If quantity is set to 0 or less, the item is removed entirely.
     """
     data = request.get_json()
     quantity = data.get('quantity', 1)
 
     if quantity <= 0:
-        redis_svc.remove_from_cart(request.user_id, item_id)
+        cart_svc.remove_from_cart(request.user_id, item_id)
     else:
-        redis_svc.update_quantity(request.user_id, item_id, quantity)
+        cart_svc.update_quantity(request.user_id, item_id, quantity)
 
-    cart = redis_svc.get_cart(request.user_id)
+    cart = cart_svc.get_cart(request.user_id)
     return jsonify({'message': 'Cart updated', 'cart': cart})
 
 
@@ -63,11 +60,11 @@ def update_cart_item(item_id):
 @token_required
 def remove_from_cart(item_id):
     """
-    Deletes a specific item entirely from the user's Redis session cart,
+    Deletes a specific item entirely from the user's cart,
     regardless of its current quantity.
     """
-    redis_svc.remove_from_cart(request.user_id, item_id)
-    cart = redis_svc.get_cart(request.user_id)
+    cart_svc.remove_from_cart(request.user_id, item_id)
+    cart = cart_svc.get_cart(request.user_id)
     return jsonify({'message': 'Item removed', 'cart': cart})
 
 
@@ -75,8 +72,7 @@ def remove_from_cart(item_id):
 @token_required
 def clear_cart():
     """
-    Purges all items from the user's cart by deleting the associated 
-    session key from the Redis datastore.
+    Purges all items from the user's cart.
     """
-    redis_svc.clear_cart(request.user_id)
+    cart_svc.clear_cart(request.user_id)
     return jsonify({'message': 'Cart cleared', 'cart': []})

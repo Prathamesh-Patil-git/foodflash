@@ -75,11 +75,11 @@ def token_required(f):
 
 
 def admin_required(f):
-    """Decorator to restrict routes to admin or restaurant users only."""
+    """Decorator to restrict routes to admin users only."""
     @wraps(f)
     @token_required
     def decorated(*args, **kwargs):
-        if request.user_role not in ('admin', 'restaurant'):
-            return jsonify({'error': 'Admin or Restaurant access required'}), 403
+        if request.user_role not in ('admin',):
+            return jsonify({'error': 'Admin access required'}), 403
         return f(*args, **kwargs)
     return decorated

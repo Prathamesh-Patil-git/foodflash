@@ -16,7 +16,6 @@ def place_order():
     the transaction. Automatically rolls back all changes on any failure.
     """
     data = request.get_json()
-    restaurant_id = data.get('restaurant_id', 1)
     items = data.get('items', [])  # [{"menu_item_id":1, "quantity":2, "unit_price":349}]
     discount = data.get('discount', 0)
 
@@ -36,10 +35,9 @@ def place_order():
 
         # Insert order
         cursor.execute(
-            """INSERT INTO orders (user_id, restaurant_id, total_amount,
-               tax_amount, discount, final_amount, status)
-               VALUES (%s, %s, %s, %s, %s, %s, 'placed')""",
-            (request.user_id, restaurant_id, total, tax, discount, final_amount)
+            """INSERT INTO orders (user_id, total_amount, tax_amount, discount, final_amount, status)
+               VALUES (%s, %s, %s, %s, %s, 'placed')""",
+            (request.user_id, total, tax, discount, final_amount)
         )
         order_id = cursor.lastrowid
 
@@ -86,11 +84,9 @@ def get_orders():
     subsequently querying and appending detailed item records for each parent order.
     """
     orders = execute_query(
-        """SELECT o.*, r.name AS restaurant_name
-           FROM orders o
-           JOIN restaurants r ON o.restaurant_id = r.id
-           WHERE o.user_id = %s
-           ORDER BY o.created_at DESC""",
+        """SELECT * FROM orders
+           WHERE user_id = %s
+           ORDER BY created_at DESC""",
         (request.user_id,)
     )
 
@@ -112,13 +108,11 @@ def get_orders():
 @token_required
 def get_order(order_id):
     """
-    Fetches the complete breakdown of a specific order, including restaurant details 
-    and individual itemized products, ensuring the requestor is the owner of the order.
+    Fetches the complete breakdown of a specific order, including itemized products,
+    ensuring the requestor is the owner of the order.
     """
     orders = execute_query(
-        """SELECT o.*, r.name AS restaurant_name
-           FROM orders o JOIN restaurants r ON o.restaurant_id = r.id
-           WHERE o.id = %s AND o.user_id = %s""",
+        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
         (order_id, request.user_id)
     )
     if not orders:

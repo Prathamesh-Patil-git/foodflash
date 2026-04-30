@@ -87,7 +87,7 @@ async function addToCart(id) {
     id: item.id,
     name: item.name,
     price: item.price,
-    restaurant: item.restaurant_name || item.restaurant,
+    restaurant: 'FoodFlash Kitchen',
     img: item.image_url || item.img,
     veg: item.is_veg !== undefined ? item.is_veg : item.veg
   };

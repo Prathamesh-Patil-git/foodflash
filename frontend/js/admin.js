@@ -26,7 +26,7 @@ function switchSection(sectionName) {
 
 // ===== DASHBOARD =====
 async function renderDashboard(container) {
-  let stats = { total_revenue: 0, orders_today: 0, active_customers: 0, avg_rating: 0 };
+  let stats = { total_revenue: 0, orders_today: 0, active_customers: 0 };
   let orders = [];
 
   if (token) {
@@ -327,17 +327,16 @@ function renderChatbot(container) {
 // ===== DATABASE SECTION =====
 function renderDatabase(container) {
   container.innerHTML = `
-    <div style="margin-bottom:32px;"><h1 style="font-size:1.75rem;font-weight:800;">Database</h1><p style="color:var(--text-muted);font-size:0.9rem;">MySQL 8.0 — Single restaurant, 3NF normalized, 6 tables, InnoDB engine.</p></div>
+    <div style="margin-bottom:32px;"><h1 style="font-size:1.75rem;font-weight:800;">Database</h1><p style="color:var(--text-muted);font-size:0.9rem;">MySQL 8.0 — Single restaurant (FoodFlash Kitchen), 3NF normalized, 4 tables, InnoDB engine.</p></div>
     <div class="card" style="padding:24px;">
       <h3 style="margin-bottom:16px;font-weight:700;">Schema Tables</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-        ${['users','restaurants','menu_items','orders','order_items','payments'].map(t => `
+        ${['users','menu_items','orders','order_items','payments'].map(t => `
           <div style="padding:16px;border-radius:12px;background:var(--bg-glass);border:1px solid var(--border-glass);">
             <div style="font-weight:700;margin-bottom:4px;"><i class="fas fa-table" style="color:var(--accent-orange);"></i> ${t}</div>
             <div style="font-size:0.8rem;color:var(--text-muted);">${{
               users:'Roles: customer, admin | email, phone',
-              restaurants:'Single entry — name, cuisine, rating',
-              menu_items:'FK→restaurants | price, category, veg',
+              menu_items:'name, price, category, veg, image',
               orders:'FK→users | total, tax, discount, status',
               order_items:'Junction (order↔menu) | qty, price',
               payments:'Razorpay IDs, signature, method'
@@ -445,8 +444,7 @@ function showAddItemModal() {
       price: parseFloat(document.getElementById('aiPrice').value),
       category: document.getElementById('aiCategory').value,
       is_veg: document.getElementById('aiVeg').checked,
-      image_url: document.getElementById('aiImg')?.value || '',
-      restaurant_id: 1
+      image_url: document.getElementById('aiImg')?.value || ''
     };
 
     if (token) {

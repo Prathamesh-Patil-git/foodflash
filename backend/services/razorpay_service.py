@@ -1,2 +1,2 @@
 # Razorpay payment service
-from services.redis_service import RedisService
+# Razorpay SDK calls are made directly in payment_routes.py

@@ -27,13 +27,13 @@ env/
 Thumbs.db
 desktop.ini
 
-# Redis dump
-dump.rdb
-
 # ChromaDB
 chroma_db/
 chroma_data/
 backend/chroma_data/
+
+# Tool artifacts
+.code-review-graph/
 
 # Logs
 *.log

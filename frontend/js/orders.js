@@ -104,7 +104,7 @@ async function fetchOrders() {
       <div class="order-header">
         <div>
           <div class="order-id">#ORD-${String(order.id).padStart(4,'0')}</div>
-          <div style="font-size:0.85rem;color:var(--text-muted);">${date} • ${order.restaurant_name||'Restaurant'}</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);">${date} • FoodFlash Kitchen</div>
         </div>
         <span class="order-status ${s.class}"><i class="fas ${s.icon}"></i> ${s.label}</span>
       </div>

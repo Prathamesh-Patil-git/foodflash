@@ -1,5 +1,5 @@
 // ===== FoodFlash — Cart JS Module =====
-// Cart CRUD via Redis API + Razorpay checkout integration
+// Cart CRUD via in-memory API + Razorpay checkout integration
 var API = window.FOODFLASH_API || 'http://localhost:5000/api';
 const TAX_RATE = 0.05;
 let discountAmount = 0;
@@ -25,7 +25,7 @@ function renderCart() {
            onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop'"></div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
-        <div style="font-size:0.85rem;color:var(--text-muted);">${item.restaurant}</div>
+        <div style="font-size:0.85rem;color:var(--text-muted);">FoodFlash Kitchen</div>
         <div class="cart-item-price">₹${item.price}</div>
       </div>
       <div class="qty-control">
@@ -88,7 +88,7 @@ async function initiateCheckout() {
     const orderRes = await fetch(`${API}/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ restaurant_id: 1, items, discount: discountAmount })
+      body: JSON.stringify({ items, discount: discountAmount })
     });
 
     if (!orderRes.ok) {

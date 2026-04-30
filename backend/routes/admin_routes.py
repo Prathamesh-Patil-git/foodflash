@@ -11,9 +11,9 @@ def get_stats():
     """
     Aggregates key performance metrics for the admin dashboard.
     Calculates total historical revenue (excluding cancelled orders), daily order volume, 
-    unique active customers, and average restaurant rating.
+    unique active customers, and top selling menu items.
     Also retrieves the top 5 highest-selling menu items by joining order_items 
-    and menu_items tables, grouped by item and restaurant.
+    and menu_items tables, grouped by item.
     """
     revenue = execute_query(
         "SELECT COALESCE(SUM(final_amount), 0) AS total FROM orders WHERE status != 'cancelled'"
@@ -24,16 +24,12 @@ def get_stats():
     customers = execute_query(
         "SELECT COUNT(DISTINCT user_id) AS count FROM orders"
     )
-    avg_rating = execute_query(
-        "SELECT ROUND(AVG(rating), 1) AS avg FROM restaurants"
-    )
 
     top_items = execute_query("""
-        SELECT mi.name, mi.image_url, r.name AS restaurant, SUM(oi.quantity) AS total_sold
+        SELECT mi.name, mi.image_url, SUM(oi.quantity) AS total_sold
         FROM order_items oi
         JOIN menu_items mi ON oi.menu_item_id = mi.id
-        JOIN restaurants r ON mi.restaurant_id = r.id
-        GROUP BY mi.id, mi.name, mi.image_url, r.name
+        GROUP BY mi.id, mi.name, mi.image_url
         ORDER BY total_sold DESC LIMIT 5
     """)
 
@@ -41,7 +37,6 @@ def get_stats():
         'total_revenue': float(revenue[0]['total']) if revenue else 0,
         'orders_today': orders_today[0]['count'] if orders_today else 0,
         'active_customers': customers[0]['count'] if customers else 0,
-        'avg_rating': float(avg_rating[0]['avg']) if avg_rating and avg_rating[0]['avg'] else 0,
         'top_items': top_items
     })
 
@@ -92,14 +87,13 @@ def add_menu_item():
     """
     Provisions a new menu item in the database.
     Accepts JSON payload containing item specifications (name, price, category, etc.) 
-    and executes an INSERT operation. Currently defaults to restaurant_id=1 for the 
-    single-restaurant implementation. Returns the newly generated item ID.
+    and executes an INSERT operation. Returns the newly generated item ID.
     """
     data = request.get_json()
 
     item_id = execute_query(
-        """INSERT INTO menu_items (restaurant_id, name, description, price, category, is_veg, image_url)
-           VALUES (1, %s, %s, %s, %s, %s, %s)""",
+        """INSERT INTO menu_items (name, description, price, category, is_veg, image_url)
+           VALUES (%s, %s, %s, %s, %s, %s)""",
         (data['name'], data.get('description', ''),
          data['price'], data['category'], data.get('is_veg', False), data.get('image_url', '')),
         fetch=False
@@ -176,7 +170,7 @@ def clear_all_customers():
     Purges all customer accounts and their associated historical data.
     Executes a cascaded transaction that first removes payments, order_items, and orders 
     tied to 'customer' role users, followed by deleting the user records themselves.
-    Admin and restaurant accounts are explicitly preserved.
+    Admin accounts are explicitly preserved.
     """
     from utils.db import get_db
     conn = get_db()

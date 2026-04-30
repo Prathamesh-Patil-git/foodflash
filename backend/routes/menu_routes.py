@@ -4,29 +4,16 @@ from utils.db import execute_query
 menu_bp = Blueprint('menu', __name__)
 
 
-@menu_bp.route('/restaurants', methods=['GET'])
-def get_restaurants():
-    """
-    Queries and returns a list of all non-deleted, active restaurants,
-    ordered descending by their average customer rating.
-    """
-    restaurants = execute_query(
-        "SELECT * FROM restaurants WHERE is_active = TRUE ORDER BY rating DESC"
-    )
-    return jsonify({'restaurants': restaurants})
-
-
 @menu_bp.route('/menu', methods=['GET'])
 def get_menu():
     """
     Retrieves menu items dynamically based on provided query parameters 
-    (category, vegetarian status, search term, restaurant ID). Constructs a 
-    parameterized SQL query to filter results and prevent SQL injection.
+    (category, vegetarian status, search term). Constructs a parameterized 
+    SQL query to filter results and prevent SQL injection.
     """
     category = request.args.get('category')
     veg = request.args.get('veg')
     search = request.args.get('search')
-    restaurant_id = request.args.get('restaurant_id')
 
     query = "SELECT * FROM vw_menu_full WHERE 1=1"
     params = []
@@ -38,13 +25,10 @@ def get_menu():
         query += " AND is_veg = %s"
         params.append(veg.lower() == 'true')
     if search:
-        query += " AND (name LIKE %s OR restaurant_name LIKE %s)"
-        params.extend([f'%{search}%', f'%{search}%'])
-    if restaurant_id:
-        query += " AND id IN (SELECT id FROM menu_items WHERE restaurant_id = %s)"
-        params.append(restaurant_id)
+        query += " AND name LIKE %s"
+        params.append(f'%{search}%')
 
-    query += " ORDER BY restaurant_rating DESC, name ASC"
+    query += " ORDER BY name ASC"
     items = execute_query(query, tuple(params))
     return jsonify({'menu_items': items})
 

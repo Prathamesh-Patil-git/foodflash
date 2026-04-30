@@ -1,5 +1,5 @@
 # Services package
-from services.redis_service import RedisService
+from services.cart_service import CartService
 
 try:
     from services.rag_service import RAGService
