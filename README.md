@@ -106,27 +106,70 @@
 
 ## Architecture
 
-```
-+--------------------------------------------------------------+
-|                     FRONTEND (HTML/CSS/JS)                   |
-|  +---------+ +------+ +------+ +--------+ +--------------+  |
-|  |  Home   | | Menu | | Cart | | Orders | | Admin Panel  |  |
-|  +----+----+ +--+---+ +--+---+ +---+----+ +------+-------+  |
-+-------+---------+--------+---------+--------------+----------+
-        |         |        |         |              |
-        v         v        v         v              v
-+--------------------------------------------------------------+
-|                    FLASK REST API (Python)                    |
-|  +----------+ +----------+ +-----------+ +---------------+  |
-|  | Auth API | | Menu API | | Order API | | Chatbot API   |  |
-|  +----+-----+ +----+-----+ +-----+-----+ +-------+-------+  |
-+-------+------------+-------------+----------------+----------+
-        |            |             |                |
-        v            v             v                v
-+-------------+ +----------+ +----------+ +----------------+
-|  MySQL 8.0  | |  In-Mem  | | Razorpay | | ChromaDB +     |
-|  (Primary)  | |  Cart    | |  (Pay)   | | Gemini (RAG)   |
-+-------------+ +----------+ +----------+ +----------------+
+```mermaid
+flowchart TB
+    classDef frontend  fill:#1a1a2e,stroke:#4a9eff,stroke-width:2px,color:#e0e0ff
+    classDef backend   fill:#16213e,stroke:#ff6b35,stroke-width:2px,color:#ffe0d0
+    classDef database  fill:#0f3460,stroke:#06d6a0,stroke-width:2px,color:#d0fff5
+    classDef external  fill:#2d1b69,stroke:#e040fb,stroke-width:2px,color:#f0d0ff
+
+    %% ── Frontend Pages ──────────────────────────────────────
+    subgraph FE["  Frontend  —  HTML / CSS / JavaScript  "]
+        direction LR
+        Home([Home Page]):::frontend
+        MenuP([Menu Page]):::frontend
+        CartP([Cart Page]):::frontend
+        OrdersP([Orders Page]):::frontend
+        AdminP([Admin Panel]):::frontend
+    end
+
+    %% ── Flask REST API ───────────────────────────────────────
+    subgraph API["  Flask REST API  —  Python / Blueprint Routes  "]
+        direction LR
+        AuthR[Auth Routes\n/api/auth]:::backend
+        MenuR[Menu Routes\n/api/menu]:::backend
+        CartR[Cart Routes\n/api/cart]:::backend
+        OrderR[Order Routes\n/api/orders]:::backend
+        PayR[Payment Routes\n/api/payments]:::backend
+        ChatR[Chatbot Routes\n/api/chatbot]:::backend
+    end
+
+    %% ── Persistence Layer ────────────────────────────────────
+    subgraph STORE["  Persistence Layer  "]
+        direction LR
+        MySQL[(MySQL 8.0\nPrimary Database)]:::database
+        InMem[(CartService\nIn-Memory Dict)]:::database
+        Chroma[(ChromaDB\nVector Database)]:::database
+    end
+
+    %% ── External Services ────────────────────────────────────
+    subgraph EXT["  External Services  "]
+        direction LR
+        Razorpay{{Razorpay\nPayment Gateway}}:::external
+        Gemini{{Google\nGemini API}}:::external
+    end
+
+    %% ── Frontend → Backend ───────────────────────────────────
+    FE -->|"HTTP REST calls\nAuthorization: Bearer token"| API
+
+    %% ── Backend → MySQL ──────────────────────────────────────
+    AuthR  -->|"SELECT / INSERT users\nbcrypt + JWT"| MySQL
+    MenuR  -->|"SELECT vw_menu_full\n+ dynamic WHERE filters"| MySQL
+    OrderR -->|"ACID Transaction\nSTART / COMMIT / ROLLBACK"| MySQL
+    PayR   -->|"UPDATE payments + orders\nstatus = captured / failed"| MySQL
+
+    %% ── Backend → In-Memory Cart ─────────────────────────────
+    CartR  <-->|"get_cart / add_to_cart\nupdate_qty / clear_cart"| InMem
+
+    %% ── Backend → ChromaDB ───────────────────────────────────
+    ChatR  -->|"collection.query()\ncosine similarity — top 5"| Chroma
+
+    %% ── Backend → External ───────────────────────────────────
+    PayR   <-->|"order.create()\nutility.verify_payment_signature()"| Razorpay
+    ChatR  -->|"model.generate_content()\nRAG augmented prompt"| Gemini
+
+    %% ── MySQL seeds ChromaDB at startup ──────────────────────
+    MySQL  -.->|"_seed_embeddings()\nvw_menu_full → ChromaDB\non server start"| Chroma
 ```
 
 ---

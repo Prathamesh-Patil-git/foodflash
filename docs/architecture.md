@@ -7,48 +7,69 @@ This document provides a high-level overview of the architectural design and tec
 FoodFlash uses a **Client-Server Architecture** with a clear separation between the frontend UI, the RESTful backend, and the persistence layer.
 
 ```mermaid
-flowchart TD
-    %% Frontend Components
-    subgraph Frontend ["Client / Frontend (HTML, CSS, JS)"]
-        UI[User Interface]
-        RazorpayUI[Razorpay Checkout]
+flowchart TB
+    classDef frontend  fill:#1a1a2e,stroke:#4a9eff,stroke-width:2px,color:#e0e0ff
+    classDef backend   fill:#16213e,stroke:#ff6b35,stroke-width:2px,color:#ffe0d0
+    classDef database  fill:#0f3460,stroke:#06d6a0,stroke-width:2px,color:#d0fff5
+    classDef external  fill:#2d1b69,stroke:#e040fb,stroke-width:2px,color:#f0d0ff
+
+    %% ── Frontend Pages ──────────────────────────────────────
+    subgraph FE["  Frontend  —  HTML / CSS / JavaScript  "]
+        direction LR
+        Home([Home Page]):::frontend
+        MenuP([Menu Page]):::frontend
+        CartP([Cart Page]):::frontend
+        OrdersP([Orders Page]):::frontend
+        AdminP([Admin Panel]):::frontend
     end
 
-    %% Backend Services
-    subgraph Backend ["Flask REST API (Python)"]
-        AuthAPI["Auth Service (JWT)"]
-        MenuAPI[Menu Service]
-        CartAPI["Cart Service (In-Memory)"]
-        OrderAPI["Order/Payment Service"]
-        ChatAPI[RAG Chatbot Service]
+    %% ── Flask REST API ───────────────────────────────────────
+    subgraph API["  Flask REST API  —  Python / Blueprint Routes  "]
+        direction LR
+        AuthR[Auth Routes\n/api/auth]:::backend
+        MenuR[Menu Routes\n/api/menu]:::backend
+        CartR[Cart Routes\n/api/cart]:::backend
+        OrderR[Order Routes\n/api/orders]:::backend
+        PayR[Payment Routes\n/api/payments]:::backend
+        ChatR[Chatbot Routes\n/api/chatbot]:::backend
     end
 
-    %% Databases
-    subgraph Databases [Persistence Layer]
-        MySQL[("MySQL 8.0\nPrimary Relational")]
-        InMem[("Python Dict\nIn-Memory Cart")]
-        Chroma[("ChromaDB\nVector Database")]
+    %% ── Persistence Layer ────────────────────────────────────
+    subgraph STORE["  Persistence Layer  "]
+        direction LR
+        MySQL[(MySQL 8.0\nPrimary Database)]:::database
+        InMem[(CartService\nIn-Memory Dict)]:::database
+        Chroma[(ChromaDB\nVector Database)]:::database
     end
 
-    %% External APIs
-    subgraph External [External Services]
-        Razorpay[Razorpay Gateway]
-        Gemini[Google Gemini API]
+    %% ── External Services ────────────────────────────────────
+    subgraph EXT["  External Services  "]
+        direction LR
+        Razorpay{{Razorpay\nPayment Gateway}}:::external
+        Gemini{{Google\nGemini API}}:::external
     end
 
-    %% Flow connections
-    UI <-->|REST API over HTTP| Backend
-    RazorpayUI <-->|Token processing| Razorpay
+    %% ── Frontend → Backend ───────────────────────────────────
+    FE -->|"HTTP REST calls\nAuthorization: Bearer token"| API
 
-    AuthAPI <--> MySQL
-    MenuAPI <--> MySQL
-    CartAPI <--> InMem
-    OrderAPI <--> MySQL
-    OrderAPI <-->|Server Verify| Razorpay
+    %% ── Backend → MySQL ──────────────────────────────────────
+    AuthR  -->|"SELECT / INSERT users\nbcrypt + JWT"| MySQL
+    MenuR  -->|"SELECT vw_menu_full\n+ dynamic WHERE filters"| MySQL
+    OrderR -->|"ACID Transaction\nSTART / COMMIT / ROLLBACK"| MySQL
+    PayR   -->|"UPDATE payments + orders\nstatus = captured / failed"| MySQL
 
-    ChatAPI <-->|Vector Search| Chroma
-    ChatAPI <-->|RAG Generation| Gemini
-    MySQL -.->|Seed Embeddings| Chroma
+    %% ── Backend → In-Memory Cart ─────────────────────────────
+    CartR  <-->|"get_cart / add_to_cart\nupdate_qty / clear_cart"| InMem
+
+    %% ── Backend → ChromaDB ───────────────────────────────────
+    ChatR  -->|"collection.query()\ncosine similarity — top 5"| Chroma
+
+    %% ── Backend → External ───────────────────────────────────
+    PayR   <-->|"order.create()\nutility.verify_payment_signature()"| Razorpay
+    ChatR  -->|"model.generate_content()\nRAG augmented prompt"| Gemini
+
+    %% ── MySQL seeds ChromaDB at startup ──────────────────────
+    MySQL  -.->|"_seed_embeddings()\nvw_menu_full → ChromaDB\non server start"| Chroma
 ```
 
 ## 2. Technology Stack Mapping to DBMS Syllabus
