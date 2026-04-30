@@ -11,7 +11,7 @@ erDiagram
     USERS {
         int         id              PK
         varchar     name
-        varchar     email           UK
+        varchar     email               "unique"
         varchar     password_hash
         varchar     phone
         enum        role            "customer | admin"
@@ -37,7 +37,7 @@ erDiagram
         decimal     tax_amount
         decimal     discount
         decimal     final_amount
-        enum        status          "placed|confirmed|preparing|food_prepared|served|cancelled"
+        enum        status              "placed,confirmed,preparing,food_prepared,served,cancelled"
         timestamp   created_at
         timestamp   updated_at
     }
@@ -53,12 +53,12 @@ erDiagram
 
     PAYMENTS {
         int         id              PK
-        int         order_id        FK  UK
+        int         order_id        FK  "unique"
         varchar     razorpay_order_id
         varchar     razorpay_payment_id
         varchar     razorpay_signature
         decimal     amount
-        enum        status          "created|captured|failed|refunded"
+        enum        status              "created,captured,failed,refunded"
         varchar     method
         timestamp   created_at
     }
