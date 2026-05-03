@@ -235,7 +235,7 @@ flowchart TD
     paid_via ===|1| PAYMENT
 
     %% USER Attributes
-    U_id(["<u>id</u>"]):::attribute
+    U_id(["i̲d̲"]):::attribute
     U_name(["name"]):::attribute
     U_email(["email"]):::attribute
     U_phone(["phone"]):::attribute
@@ -248,7 +248,7 @@ flowchart TD
     USER --- U_role
 
     %% ORDER Attributes
-    O_id(["<u>id</u>"]):::attribute
+    O_id(["i̲d̲"]):::attribute
     O_tot(["total_amount"]):::attribute
     O_tax(["tax_amount"]):::derivedAttribute
     O_dis(["discount"]):::attribute
@@ -270,7 +270,7 @@ flowchart TD
     contains --- C_price
 
     %% MENU_ITEM Attributes
-    M_id(["<u>id</u>"]):::attribute
+    M_id(["i̲d̲"]):::attribute
     M_name(["name"]):::attribute
     M_price(["price"]):::attribute
     M_cat(["category"]):::attribute
