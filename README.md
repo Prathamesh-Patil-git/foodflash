@@ -201,12 +201,97 @@ placed -> confirmed -> preparing -> food_prepared -> served
    +-------------------> cancelled (only before food_prepared)
 ```
 
-### Key Relationships
+### Entity-Relationship Diagram (Chen Notation)
 
-```
-users --(1:N)--> orders --(1:N)--> order_items --(N:1)--> menu_items
-                    |
-                    +--(1:1)--> payments
+```mermaid
+flowchart TD
+    %% Styling Definitions to match Chen notation
+    classDef entity fill:#f4f4f4,stroke:#333,stroke-width:2px,color:#000
+    classDef weakEntity fill:#f4f4f4,stroke:#333,stroke-width:4px,color:#000
+    classDef relationship fill:#f4f4f4,stroke:#333,stroke-width:2px,shape:diamond,color:#000
+    classDef identifyingRel fill:#f4f4f4,stroke:#333,stroke-width:4px,shape:diamond,color:#000
+    classDef attribute fill:#f4f4f4,stroke:#333,stroke-width:2px,color:#000,rx:20,ry:20
+    classDef derivedAttribute fill:#f4f4f4,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5,color:#000,rx:20,ry:20
+
+    %% Entities
+    USER[USER]:::entity
+    ORDER[ORDER]:::entity
+    MENU_ITEM[MENU_ITEM]:::entity
+    PAYMENT[PAYMENT]:::weakEntity
+
+    %% Relationships
+    places{places}:::relationship
+    contains{contains}:::relationship
+    paid_via{paid via}:::identifyingRel
+
+    %% Layout & Participation (Total: ===, Partial: ---)
+    USER ---|1| places
+    places ===|N| ORDER
+    
+    ORDER ===|M| contains
+    contains ---|N| MENU_ITEM
+    
+    ORDER ===|1| paid_via
+    paid_via ===|1| PAYMENT
+
+    %% USER Attributes
+    U_id(["<u>id</u>"]):::attribute
+    U_name(["name"]):::attribute
+    U_email(["email"]):::attribute
+    U_phone(["phone"]):::attribute
+    U_role(["role"]):::attribute
+    
+    USER --- U_id
+    USER --- U_name
+    USER --- U_email
+    USER --- U_phone
+    USER --- U_role
+
+    %% ORDER Attributes
+    O_id(["<u>id</u>"]):::attribute
+    O_tot(["total_amount"]):::attribute
+    O_tax(["tax_amount"]):::derivedAttribute
+    O_dis(["discount"]):::attribute
+    O_fin(["final_amount"]):::derivedAttribute
+    O_stat(["status"]):::attribute
+    
+    ORDER --- O_id
+    ORDER --- O_tot
+    ORDER --- O_tax
+    ORDER --- O_dis
+    ORDER --- O_fin
+    ORDER --- O_stat
+
+    %% CONTAINS (ORDER_ITEMS) Attributes
+    C_qty(["quantity"]):::attribute
+    C_price(["unit_price"]):::attribute
+    
+    contains --- C_qty
+    contains --- C_price
+
+    %% MENU_ITEM Attributes
+    M_id(["<u>id</u>"]):::attribute
+    M_name(["name"]):::attribute
+    M_price(["price"]):::attribute
+    M_cat(["category"]):::attribute
+    M_veg(["is_veg"]):::attribute
+    
+    MENU_ITEM --- M_id
+    MENU_ITEM --- M_name
+    MENU_ITEM --- M_price
+    MENU_ITEM --- M_cat
+    MENU_ITEM --- M_veg
+
+    %% PAYMENT Attributes
+    P_id(["id (discriminator)"]):::attribute
+    P_raz(["razorpay_id"]):::attribute
+    P_amt(["amount"]):::attribute
+    P_stat(["status"]):::attribute
+    
+    PAYMENT --- P_id
+    PAYMENT --- P_raz
+    PAYMENT --- P_amt
+    PAYMENT --- P_stat
 ```
 
 ## How It Works — Technical Detail
