@@ -67,7 +67,7 @@ class RAGService:
         except Exception as e:
             print(f"Error seeding ChromaDB: {e}")
 
-    def query(self, user_query, n_results=5):
+    def query(self, user_query, n_results=15):
         """
         Processes a user query by searching the vector database for relevant 
         menu items and generating a contextualized response using the LLM.
